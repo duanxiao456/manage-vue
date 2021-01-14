@@ -4,7 +4,7 @@
       <img :src="extraImage"/>
     </div>
     <page-toggle-transition :disabled="animate.disabled" :animate="animate.name" :direction="animate.direction">
-        <router-view ref="page" />
+        <router-view />
     </page-toggle-transition>
   </page-layout>
 </template>

@@ -6,7 +6,7 @@
                     <a-row>
                         <a-col :md="8" :sm="24">
                             <a-form-item
-                                    label="规则编号"
+                                    label="执行编号"
                                     :labelCol="{span: 5}"
                                     :wrapperCol="{span: 18, offset: 1}"
                             >
@@ -15,51 +15,54 @@
                         </a-col>
                         <a-col :md="8" :sm="24">
                             <a-form-item
-                                    label="使用状态"
+                                    label="应用名称"
                                     :labelCol="{span: 5}"
                                     :wrapperCol="{span: 18, offset: 1}"
                             >
                                 <a-select placeholder="请选择">
-                                    <a-select-option value="1">关闭</a-select-option>
-                                    <a-select-option value="2">运行中</a-select-option>
+                                    <a-select-option value="1">Doordash</a-select-option>
+                                    <a-select-option value="2">Grubhub</a-select-option>
+                                    <a-select-option value="3">Instacart</a-select-option>
                                 </a-select>
                             </a-form-item>
                         </a-col>
                         <a-col :md="8" :sm="24">
                             <a-form-item
-                                    label="调用次数"
+                                    label="执行状态"
                                     :labelCol="{span: 5}"
                                     :wrapperCol="{span: 18, offset: 1}"
                             >
-                                <a-input-number style="width: 100%" placeholder="请输入"/>
+                                <a-select placeholder="请选择">
+                                    <a-select-option value="0">待执行</a-select-option>
+                                    <a-select-option value="1">执行中</a-select-option>
+                                    <a-select-option value="2">成功</a-select-option>
+                                    <a-select-option value="-2">失败</a-select-option>
+                                </a-select>
                             </a-form-item>
                         </a-col>
                     </a-row>
                     <a-row v-if="advanced">
                         <a-col :md="8" :sm="24">
                             <a-form-item
-                                    label="更新日期"
+                                    label="设备编号"
                                     :labelCol="{span: 5}"
                                     :wrapperCol="{span: 18, offset: 1}"
                             >
-                                <a-date-picker style="width: 100%" placeholder="请输入更新日期"/>
+                                <a-input placeholder="请输入(后四位即可)"/>
                             </a-form-item>
                         </a-col>
                         <a-col :md="8" :sm="24">
                             <a-form-item
-                                    label="使用状态"
+                                    label="创建日期"
                                     :labelCol="{span: 5}"
                                     :wrapperCol="{span: 18, offset: 1}"
                             >
-                                <a-select placeholder="请选择">
-                                    <a-select-option value="1">关闭</a-select-option>
-                                    <a-select-option value="2">运行中</a-select-option>
-                                </a-select>
+                                <a-range-picker style="width: 100%"/>
                             </a-form-item>
                         </a-col>
                         <a-col :md="8" :sm="24">
                             <a-form-item
-                                    label="描述"
+                                    label="错误原因"
                                     :labelCol="{span: 5}"
                                     :wrapperCol="{span: 18, offset: 1}"
                             >
@@ -81,14 +84,13 @@
         <div>
             <div class="operator">
                 <a-button @click="addNew" type="primary">新建</a-button>
-                <a-button>批量操作</a-button>
-                <a-dropdown>
+                <a-dropdown style="margin-left: 8px">
                     <a-menu @click="handleMenuClick" slot="overlay">
+                        <a-menu-item key="share">分享</a-menu-item>
                         <a-menu-item key="delete">删除</a-menu-item>
-                        <a-menu-item key="audit">审批</a-menu-item>
                     </a-menu>
                     <a-button>
-                        更多操作
+                        批量操作
                         <a-icon type="down"/>
                     </a-button>
                 </a-dropdown>
@@ -100,31 +102,22 @@
                     @clear="onClear"
                     @change="onChange"
                     @selectedRowChange="onSelectChange"
+                    @click="click"
             >
-                <div slot="description" slot-scope="{text}">
-                    {{text}}
-                </div>
                 <div slot="action" slot-scope="{text, record}">
-                    <a style="margin-right: 8px">
-                        <a-icon type="plus"/>
-                        新增
-                    </a>
                     <a style="margin-right: 8px">
                         <a-icon type="edit"/>
                         编辑
                     </a>
-                    <a @click="deleteRecord(record.key)">
-                        <a-icon type="delete"/>
-                        删除1
+                    <a style="margin-right: 8px" @click="deleteRecord(record.id)">
+                        <a-icon type="share-alt"/>
+                        分享
                     </a>
-                    <a @click="deleteRecord(record.key)" v-auth="`delete`">
+                    <a @click="deleteRecord(record.id)">
                         <a-icon type="delete"/>
-                        删除2
+                        删除
                     </a>
                 </div>
-                <template slot="statusTitle">
-                    <a-icon @click.native="onStatusTitleClick" type="info-circle"/>
-                </template>
             </standard-table>
         </div>
     </a-card>
@@ -135,34 +128,63 @@
 
     const columns = [
         {
-            title: '规则编号',
-            dataIndex: 'no'
+            title: '执行编号',
+            dataIndex: 'id',
+            width: '14%'
         },
         {
-            title: '描述',
-            dataIndex: 'description',
-            scopedSlots: {customRender: 'description'}
+            title: '设备编号',
+            dataIndex: 'clientId',
+            customRender: (text) => text.toString().split("_")[1],
+            width: '11%'
         },
         {
-            title: '服务调用次数',
-            dataIndex: 'callNo',
-            sorter: true,
-            needTotal: true,
-            customRender: (text) => text + ' 次'
+            title: '应用名称',
+            dataIndex: 'appName',
+            customRender: (text) => text.toString().charAt(0).toUpperCase() + text.slice(1),
+            width: '8%'
         },
         {
+            title: '执行状态',
             dataIndex: 'status',
-            needTotal: true,
-            slots: {title: 'statusTitle'}
+            customRender: (state) => {
+                switch (state) {
+                    case 0:
+                        return "待执行";
+                    case 1:
+                        return "执行中";
+                    case 2:
+                        return "成功";
+                    case -2:
+                        return "失败";
+                    case 4:
+                        return "手动取消";
+                }
+            },
+            width: '6%'
         },
         {
-            title: '更新时间',
-            dataIndex: 'updatedAt',
-            sorter: true
+            title: '错误原因',
+            dataIndex: 'errorReason',
+            ellipsis: true,
+            width: '20%'
+        },
+        {
+            title: '创建时间',
+            dataIndex: 'createTime',
+            sorter: true,
+            width: '12%'
+        },
+        {
+            title: '最后修改时间',
+            dataIndex: 'updateTime',
+            sorter: true,
+            width: '12%'
         },
         {
             title: '操作',
-            scopedSlots: {customRender: 'action'}
+            scopedSlots: {customRender: 'action'},
+            width: '16%'
         }
     ]
 
@@ -171,11 +193,13 @@
     for (let i = 0; i < 100; i++) {
         dataSource.push({
             key: i,
-            no: 'NO ' + i,
-            description: '这是一段描述',
-            callNo: Math.floor(Math.random() * 1000),
-            status: Math.floor(Math.random() * 10) % 4,
-            updatedAt: '2018-07-26'
+            id: "5fe3aeff6c9c82001c1428e" + i,
+            clientId: "com.huateng.aicontrol_35253008294760" + i,
+            appName: "grubhub",
+            status: 2,
+            errorReason: "Wait too long, target does not appear: UiSelector[CHILD=UiSelector[TEXT=Tip your delivery person?], RESOURCE_ID=com.instacart.client:id/ic__tip_toolbar]",
+            createTime: "2020-12-24 11:12:16",
+            updateTime: "2020-12-31 23:09:33"
         })
     }
 
@@ -194,15 +218,15 @@
             deleteRecord: 'delete'
         },
         methods: {
-            deleteRecord(key) {
-                this.dataSource = this.dataSource.filter(item => item.key !== key)
-                this.selectedRows = this.selectedRows.filter(item => item.key !== key)
+            deleteRecord(id) {
+                this.dataSource = this.dataSource.filter(item => item.id !== id)
+                this.selectedRows = this.selectedRows.filter(item => item.id !== id)
             },
             toggleAdvanced() {
                 this.advanced = !this.advanced
             },
             remove() {
-                this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.key === item.key) === -1)
+                this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.id === item.id) === -1)
                 this.selectedRows = []
             },
             onClear() {
@@ -216,21 +240,25 @@
             },
             onSelectChange() {
                 this.$message.info('选中行改变了')
+                console.log('选中行改变了')
             },
             addNew() {
                 this.dataSource.unshift({
-                    key: this.dataSource.length,
-                    no: 'NO ' + this.dataSource.length,
-                    description: '这是一段描述',
-                    callNo: Math.floor(Math.random() * 1000),
-                    status: Math.floor(Math.random() * 10) % 4,
-                    updatedAt: '2018-07-26'
+                    id: "5fe3aeff6c9c82001c1428e",
+                    clientId: "com.huateng.aicontrol_35253008294760",
+                    appName: "grubhub",
+                    status: 2,
+                    errorReason: "这是一段错误原因",
+                    createTime: "2018-07-26",
                 })
             },
             handleMenuClick(e) {
-                if (e.key === 'delete') {
+                if (e.id === 'delete') {
                     this.remove()
                 }
+            },
+            click(record) {
+                console.log(record)
             }
         }
     }

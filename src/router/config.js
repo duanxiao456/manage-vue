@@ -70,17 +70,25 @@ const options = {
                             component: BlankView,
                             children: [
                                 {
-                                    path: 'article',
+                                    path: 'analysis',
                                     name: '购买分析',
-                                    component: () => import('@/pages/list/search/ArticleList'),
+                                    component: () => import('@/pages/dashboard/analysis'),
                                 },
                                 {
-                                    path: 'query',
-                                    name: '购买数据',
+                                    path: 'executing',
+                                    name: '购买待完',
                                     meta: {
                                         authority: 'queryForm',
                                     },
-                                    component: () => import('@/pages/list/QueryList'),
+                                    component: () => import('@/pages/executeManage/executeBuy/StandardList'),
+                                },
+                                {
+                                    path: 'record',
+                                    name: '购买记录',
+                                    meta: {
+                                        authority: 'queryForm',
+                                    },
+                                    component: () => import('@/pages/executeManage/executeBuy/QueryList'),
                                 }
                             ]
                         },
