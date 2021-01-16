@@ -1,130 +1,133 @@
 <template>
     <a-card>
-        <div :class="advanced ? 'search' : null">
-            <a-form layout="horizontal">
-                <div :class="advanced ? null: 'fold'">
-                    <a-row>
-                        <a-col :md="8" :sm="24">
-                            <a-form-item
-                                    label="执行编号"
-                                    :labelCol="{span: 5}"
-                                    :wrapperCol="{span: 18, offset: 1}"
-                            >
-                                <a-input placeholder="请输入"/>
-                            </a-form-item>
-                        </a-col>
-                        <a-col :md="8" :sm="24">
-                            <a-form-item
-                                    label="应用名称"
-                                    :labelCol="{span: 5}"
-                                    :wrapperCol="{span: 18, offset: 1}"
-                            >
-                                <a-select placeholder="请选择">
-                                    <a-select-option value="1">Doordash</a-select-option>
-                                    <a-select-option value="2">Grubhub</a-select-option>
-                                    <a-select-option value="3">Instacart</a-select-option>
-                                </a-select>
-                            </a-form-item>
-                        </a-col>
-                        <a-col :md="8" :sm="24">
-                            <a-form-item
-                                    label="执行状态"
-                                    :labelCol="{span: 5}"
-                                    :wrapperCol="{span: 18, offset: 1}"
-                            >
-                                <a-select placeholder="请选择">
-                                    <a-select-option value="0">待执行</a-select-option>
-                                    <a-select-option value="1">执行中</a-select-option>
-                                    <a-select-option value="2">成功</a-select-option>
-                                    <a-select-option value="-2">失败</a-select-option>
-                                </a-select>
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
-                    <a-row v-if="advanced">
-                        <a-col :md="8" :sm="24">
-                            <a-form-item
-                                    label="设备编号"
-                                    :labelCol="{span: 5}"
-                                    :wrapperCol="{span: 18, offset: 1}"
-                            >
-                                <a-input placeholder="请输入(后四位即可)"/>
-                            </a-form-item>
-                        </a-col>
-                        <a-col :md="8" :sm="24">
-                            <a-form-item
-                                    label="创建日期"
-                                    :labelCol="{span: 5}"
-                                    :wrapperCol="{span: 18, offset: 1}"
-                            >
-                                <a-range-picker style="width: 100%"/>
-                            </a-form-item>
-                        </a-col>
-                        <a-col :md="8" :sm="24">
-                            <a-form-item
-                                    label="错误原因"
-                                    :labelCol="{span: 5}"
-                                    :wrapperCol="{span: 18, offset: 1}"
-                            >
-                                <a-input placeholder="请输入"/>
-                            </a-form-item>
-                        </a-col>
-                    </a-row>
-                </div>
-                <span style="float: right; margin-top: 3px;">
-          <a-button type="primary">查询</a-button>
-          <a-button style="margin-left: 8px">重置</a-button>
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{advanced ? '收起' : '展开'}}
-            <a-icon :type="advanced ? 'up' : 'down'"/>
-          </a>
-        </span>
-            </a-form>
-        </div>
-        <div>
-            <div class="operator">
-                <a-button @click="addNew" type="primary">新建</a-button>
-                <a-dropdown style="margin-left: 8px">
-                    <a-menu @click="handleMenuClick" slot="overlay">
-                        <a-menu-item key="share">分享</a-menu-item>
-                        <a-menu-item key="delete">删除</a-menu-item>
-                    </a-menu>
-                    <a-button>
-                        批量操作
-                        <a-icon type="down"/>
-                    </a-button>
-                </a-dropdown>
+        <div v-if="flag === 'queryList'">
+            <div :class="advanced ? 'search' : null">
+                <a-form layout="horizontal">
+                    <div :class="advanced ? null: 'fold'">
+                        <a-row>
+                            <a-col :md="8" :sm="24">
+                                <a-form-item
+                                        label="执行编号"
+                                        :labelCol="{span: 5}"
+                                        :wrapperCol="{span: 18, offset: 1}"
+                                >
+                                    <a-input placeholder="请输入"/>
+                                </a-form-item>
+                            </a-col>
+                            <a-col :md="8" :sm="24">
+                                <a-form-item
+                                        label="应用名称"
+                                        :labelCol="{span: 5}"
+                                        :wrapperCol="{span: 18, offset: 1}"
+                                >
+                                    <a-select placeholder="请选择">
+                                        <a-select-option value="1">Doordash</a-select-option>
+                                        <a-select-option value="2">Grubhub</a-select-option>
+                                        <a-select-option value="3">Instacart</a-select-option>
+                                    </a-select>
+                                </a-form-item>
+                            </a-col>
+                            <a-col :md="8" :sm="24">
+                                <a-form-item
+                                        label="执行状态"
+                                        :labelCol="{span: 5}"
+                                        :wrapperCol="{span: 18, offset: 1}"
+                                >
+                                    <a-select placeholder="请选择">
+                                        <a-select-option value="0">待执行</a-select-option>
+                                        <a-select-option value="1">执行中</a-select-option>
+                                        <a-select-option value="2">成功</a-select-option>
+                                        <a-select-option value="-2">失败</a-select-option>
+                                    </a-select>
+                                </a-form-item>
+                            </a-col>
+                        </a-row>
+                        <a-row v-if="advanced">
+                            <a-col :md="8" :sm="24">
+                                <a-form-item
+                                        label="设备编号"
+                                        :labelCol="{span: 5}"
+                                        :wrapperCol="{span: 18, offset: 1}"
+                                >
+                                    <a-input placeholder="请输入(后四位即可)"/>
+                                </a-form-item>
+                            </a-col>
+                            <a-col :md="8" :sm="24">
+                                <a-form-item
+                                        label="创建日期"
+                                        :labelCol="{span: 5}"
+                                        :wrapperCol="{span: 18, offset: 1}"
+                                >
+                                    <a-range-picker style="width: 100%"/>
+                                </a-form-item>
+                            </a-col>
+                            <a-col :md="8" :sm="24">
+                                <a-form-item
+                                        label="错误原因"
+                                        :labelCol="{span: 5}"
+                                        :wrapperCol="{span: 18, offset: 1}"
+                                >
+                                    <a-input placeholder="请输入"/>
+                                </a-form-item>
+                            </a-col>
+                        </a-row>
+                    </div>
+                    <span style="float: right; margin-top: 3px;">
+                        <a-button type="primary">查询</a-button>
+                        <a-button style="margin-left: 8px">重置</a-button>
+                        <a @click="toggleAdvanced" style="margin-left: 8px">
+                            {{advanced ? '收起' : '展开'}}
+                            <a-icon :type="advanced ? 'up' : 'down'"/>
+                        </a>
+                    </span>
+                </a-form>
             </div>
-            <standard-table
-                    :columns="columns"
-                    :dataSource="dataSource"
-                    :selectedRows.sync="selectedRows"
-                    @clear="onClear"
-                    @change="onChange"
-                    @selectedRowChange="onSelectChange"
-                    @click="click"
-            >
-                <div slot="action" slot-scope="{text, record}">
-                    <a style="margin-right: 8px">
-                        <a-icon type="edit"/>
-                        编辑
-                    </a>
-                    <a style="margin-right: 8px" @click="deleteRecord(record.id)">
-                        <a-icon type="share-alt"/>
-                        分享
-                    </a>
-                    <a @click="deleteRecord(record.id)">
-                        <a-icon type="delete"/>
-                        删除
-                    </a>
+            <div>
+                <div class="operator">
+                    <a-button @click="addNew" type="primary">新建</a-button>
+                    <a-dropdown style="margin-left: 8px">
+                        <a-menu @click="handleMenuClick" slot="overlay">
+                            <a-menu-item key="share">分享</a-menu-item>
+                            <a-menu-item key="delete">删除</a-menu-item>
+                        </a-menu>
+                        <a-button>
+                            批量操作
+                            <a-icon type="down"/>
+                        </a-button>
+                    </a-dropdown>
                 </div>
-            </standard-table>
+                <standard-table
+                        :columns="columns"
+                        :dataSource="dataSource"
+                        :selectedRows.sync="selectedRows"
+                        @clear="onClear"
+                        @change="onChange"
+                        @selectedRowChange="onSelectChange"
+                >
+                    <div slot="action" slot-scope="{text, record}">
+                        <a style="margin-right: 8px" @click="findRecord(record.id)">
+                            <a-icon type="file-search"/>
+                            详情
+                        </a>
+                        <a style="margin-right: 8px" @click="deleteRecord(record.id)">
+                            <a-icon type="share-alt"/>
+                            分享
+                        </a>
+                        <a @click="deleteRecord(record.id)">
+                            <a-icon type="delete"/>
+                            删除
+                        </a>
+                    </div>
+                </standard-table>
+            </div>
         </div>
+        <details-page v-else-if="flag === 'details'" @findQueryList="findQueryList"/>
     </a-card>
 </template>
 
 <script>
     import StandardTable from '@/components/table/StandardTable'
+    import DetailsPage from './DetailsPage'
 
     const columns = [
         {
@@ -205,22 +208,30 @@
 
     export default {
         name: 'QueryList',
-        components: {StandardTable},
+        components: {StandardTable, DetailsPage},
         data() {
             return {
                 advanced: true,
+                flag: 'queryList',
                 columns: columns,
                 dataSource: dataSource,
                 selectedRows: []
             }
         },
         authorize: {
-            deleteRecord: 'delete'
+            deleteRecord: 'delete',
         },
         methods: {
             deleteRecord(id) {
                 this.dataSource = this.dataSource.filter(item => item.id !== id)
                 this.selectedRows = this.selectedRows.filter(item => item.id !== id)
+            },
+            findRecord(id) {
+                this.flag = 'details'
+                console.log(id)
+            },
+            findQueryList(type) {
+                this.flag = type
             },
             toggleAdvanced() {
                 this.advanced = !this.advanced
@@ -257,10 +268,7 @@
                     this.remove()
                 }
             },
-            click(record) {
-                console.log(record)
-            }
-        }
+        },
     }
 </script>
 

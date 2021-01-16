@@ -2,8 +2,8 @@
     <div class="page-layout">
         <page-header ref="pageHeader" :style="`margin-top: ${multiPage ? 0 : -24}px`" :breadcrumb="breadcrumb"
                      :title="pageTitle" :logo="logo" :avatar="avatar">
-            <slot name="action" slot="action"></slot>
-            <slot slot="content" name="headerContent"></slot>
+            <slot name="action" slot="action"/>
+            <slot slot="content" name="headerContent"/>
             <div slot="content" v-if="!this.$slots.headerContent && desc">
                 <p>{{desc}}</p>
                 <div v-if="this.linkList" class="link">
@@ -14,10 +14,10 @@
                     </template>
                 </div>
             </div>
-            <slot v-if="this.$slots.extra" slot="extra" name="extra"></slot>
+            <slot v-if="this.$slots.extra" slot="extra" name="extra"/>
         </page-header>
         <div ref="page" :class="['page-content', layout, pageWidth]">
-            <slot></slot>
+            <slot/>
         </div>
     </div>
 </template>
